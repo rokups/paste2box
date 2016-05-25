@@ -1,0 +1,7 @@
+PySide==1.2.4
+git+https://github.com/rokups/pyocclient.git
+imgurpython==1.1.7
+google-api-python-client==1.5.0
+cx_Freeze==4.3.4
+python3-xlib==0.15; sys_platform == 'linux'
+#pywin32 ; sys_platform == 'win32'

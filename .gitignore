@@ -1,0 +1,3 @@
+__pycache__
+gui/ui/*_ui.py
+gui/ui/*_rc.py
