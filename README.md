@@ -14,6 +14,7 @@ paste2box is the file sharing client whose purpose is to ease process of file sh
 
 ### Supported file sharing services
 
+* gist
 * owncloud
 * googledrive
 * imgur.com
