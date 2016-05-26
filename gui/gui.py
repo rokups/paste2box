@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# paste2box - file sharing client
+# paste2box - internet-enabled clipboard
 # Copyright (C) 2016  Rokas Kupstys
 #
 # This program is free software: you can redistribute it and/or modify

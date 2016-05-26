@@ -1,5 +1,5 @@
 # coding=utf-8
-# paste2box - file sharing client
+# paste2box - internet-enabled clipboard
 # Copyright (C) 2016  Rokas Kupstys
 #
 # This program is free software: you can redistribute it and/or modify
@@ -67,6 +67,6 @@ subprocess.call([sys.executable, '-m', 'win32.lib.win32verstamp',
                  '--version', const.APP_VERSION_STR + '.0',
                  '--product', const.APP_NAME,
                  '--copyright', 'Copyright © Rokas Kupstys'.format(const.APP_NAME),
-                 '--description', 'File sharing client.',
+                 '--description', 'Internet-enabled clipboard client.',
                  os.path.join(target_dir, gui_executable + '.exe')
                  ])
