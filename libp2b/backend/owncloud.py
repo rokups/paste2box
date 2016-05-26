@@ -52,6 +52,9 @@ class OwnCloudBackend(Bi):
         if self.share_type == Bi.File and isinstance(self.content, str):
             content = self.content
             upload_func = client.put_file
+        elif self.share_type == Bi.Text and isinstance(self.content, str):
+            content = self.content.encode('utf-8')
+            upload_func = client.put_file_contents
         else:
             assert isinstance(self.content, bytes)
             content = self.content
