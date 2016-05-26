@@ -97,7 +97,7 @@ class ShareDialog(QDialog, Ui_ShareDialog):
 
         if self._share_type == Bi.Image:
             if not file_name:
-                file_name = 'screenshot-%d.png' % time()
+                file_name = '{}-{}.png'.format('screenshot' if image else 'image', int(time()))
             if data.width() > self.image_preview.width() or data.height() > self.image_preview.height():
                 preview = data.scaled(self.image_preview.size(), Qt.KeepAspectRatio)
             else:
@@ -111,12 +111,12 @@ class ShareDialog(QDialog, Ui_ShareDialog):
             data = buf.data().data()
         elif self._share_type == Bi.Text:
             if not file_name:
-                file_name = 'file-%d.txt' % time()
+                file_name = 'file-{}.txt'.format(int(time()))
             self.text_preview.setPlainText(dedent_text_and_truncate(data, 128))
             self.preview_stack.setCurrentIndex(1)
         elif self._share_type == Bi.File:
             if not file_name:
-                file_name = 'file-%d.bin' % time()
+                file_name = 'file-{}.bin'.format(int(time()))
             self.text_preview.setPlainText(self.tr('No preview available'))
             self.preview_stack.setCurrentIndex(1)
 
@@ -151,16 +151,26 @@ class ShareDialog(QDialog, Ui_ShareDialog):
         self.raise_()
         self.activateWindow()
 
+    def select_backend_by_name(self, name):
+        for i, backend_type in enumerate(self._available_backends):
+            if backend_type.name == name:
+                self.backend_selector.setCurrentIndex(i)
+                self.select_backend(i)
+                return True
+        return False
+
     def select_backend(self, backend_index):
+        assert len(self._available_backends)
         self._backend = self._available_backends[backend_index]()
-        self._backend_controls = {}
-        self.setWindowTitle('{} {}'.format(self.tr('Share on'), self._backend.name))
+
         self.populate_logins()
+        self.setWindowTitle('{} {}'.format(self.tr('Share on'), self._backend.name))
 
         # Populate widgets
         for i in reversed(range(self.backend_controls.count())):
             self.backend_controls.itemAt(i).widget().setParent(None)
 
+        self._backend_controls = {}
         for title, kind in self._backend.post_fields.items():
             label = QLabel(title)
             control = get_control_by_type(kind)
@@ -170,20 +180,28 @@ class ShareDialog(QDialog, Ui_ShareDialog):
                 set_widget_value(control, self._file_name)
 
     def populate_backends(self):
-        while self.backend_selector.count():
-            self.backend_selector.removeTab(0)
-
-        for name, backend in all_backends.items():
-            if (self._share_type == Bi.Image and backend.capabilities & Bi.CanPostImage) or \
-               (self._share_type == Bi.Text and backend.capabilities & Bi.CanPostText) or \
-               (self._share_type == Bi.File and backend.capabilities & Bi.CanPostFile):
-                self.backend_selector.addTab(QWidget(), name)
-                self._available_backends.append(backend)
         try:
-            last_backend = all_backends[settings['last_backend/{}'.format(self._share_type)]]
+            self.backend_selector.blockSignals(True)
+            self._available_backends = []
+
+            while self.backend_selector.count():
+                self.backend_selector.removeTab(0)
+
+            for name, backend in all_backends.items():
+                if (self._share_type == Bi.Image and backend.capabilities & Bi.CanPostImage) or \
+                   (self._share_type == Bi.Text and backend.capabilities & Bi.CanPostText) or \
+                   (self._share_type == Bi.File and backend.capabilities & Bi.CanPostFile):
+                    self.backend_selector.addTab(QWidget(), name)
+                    self._available_backends.append(backend)
+        finally:
+            self.backend_selector.blockSignals(False)
+
+        try:
+            last_backend = settings['last_backend/{}'.format(self._share_type)]
         except KeyError:
-            last_backend = list(all_backends.values())[0]
-        self.select_backend(list(all_backends.values()).index(last_backend))
+            last_backend = list(all_backends.values())[0].name
+        if not self.select_backend_by_name(last_backend):
+            self.select_backend(0)
 
     def logout_selected(self):
         selected_login = self.get_login_name()
@@ -205,27 +223,32 @@ class ShareDialog(QDialog, Ui_ShareDialog):
 
     def populate_logins(self):
         backend = self._backend
-        if backend.capabilities & Bi.CanAuthenticate:
-            self.login_list.blockSignals(True)
+        self.login_list.blockSignals(True)
+        try:
             self.login_list.clear()
-            if backend.capabilities & Bi.CanAnonymous:
-                self.login_list.addItem(self._label_anonymous)
+            if backend.capabilities & Bi.CanAuthenticate:
+                self.login_list.setEnabled(True)
+                self.logout.setEnabled(True)
+                self.add_login.setEnabled(True)
+                if backend.capabilities & Bi.CanAnonymous:
+                    self.login_list.addItem(self._label_anonymous)
+                else:
+                    self.login_list.addItem(self._label_select_login)
+
+                for login_name in self._backend.config['login'].keys():
+                    self.login_list.addItem(login_name)
+
+                try:
+                    self.login_list.setCurrentIndex(max(0, self.login_list.findText(
+                        self._backend.config['last_login'])))
+                except KeyError:
+                    pass                    # No last login saved
             else:
-                self.login_list.addItem(self._label_select_login)
-
-            for login_name in self._backend.config['login'].keys():
-                self.login_list.addItem(login_name)
-
+                self.login_list.setEnabled(False)
+                self.logout.setEnabled(False)
+                self.add_login.setEnabled(False)
+        finally:
             self.login_list.blockSignals(False)
-
-            try:
-                self.login_list.setCurrentIndex(max(0, self.login_list.findText(
-                    self._backend.config['last_login'])))
-            except KeyError:
-                pass                    # No last login saved
-        else:
-            self.login_list.hide()
-            self.logout.hide()
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:

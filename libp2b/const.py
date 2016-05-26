@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 APP_NAME = 'paste2box'
-APP_VERSION = (0, 1, 0)
+APP_VERSION = (0, 1, 1)
 APP_VERSION_STR = '.'.join(str(v) for v in APP_VERSION)
 APP_USERAGENT = APP_NAME + '/' + APP_VERSION_STR
 
