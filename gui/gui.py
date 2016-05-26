@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # paste2box - file sharing client
 # Copyright (C) 2016  Rokas Kupstys
 #
@@ -12,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#!/usr/bin/env python3
 import os
 import sys
 from PySide.QtCore import Qt, qDebug
@@ -125,7 +125,8 @@ class MainWindow(QMainWindow):
 def main():
     if getattr(sys, 'frozen', False):
         import httplib2
-        httplib2.CA_CERTS = os.environ['REQUESTS_CA_BUNDLE'] = os.path.join(os.getcwd(), 'cacert.pem')
+        httplib2.CA_CERTS = os.environ['REQUESTS_CA_BUNDLE'] = \
+            os.path.join(os.path.dirname(sys.executable), 'cacert.pem')
     QApplication.setAttribute(Qt.AA_X11InitThreads)
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
