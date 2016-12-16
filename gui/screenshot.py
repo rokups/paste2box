@@ -31,7 +31,6 @@ class Screenshot(QDialog):
                          Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.installEventFilter(self)
-        self.setGeometry(QApplication.desktop().screenGeometry())
         self.setMouseTracking(True)
         self._band = QRubberBand(QRubberBand.Rectangle, self)
 
@@ -40,8 +39,12 @@ class Screenshot(QDialog):
         self._origin = None
         self.selected_image = None
 
+        desktop = QApplication.desktop()
+        self.setGeometry(desktop.geometry())
+
         # Window background
-        self._snapshot = QPixmap.grabWindow(QApplication.desktop().winId())
+        self._snapshot = QPixmap.grabWindow(desktop.winId(), 0, 0, desktop.width(), desktop.height())
+
         self._image = self._snapshot.toImage()
         self._transparent = self._image.copy()
         self.set_alpha(self._transparent, 100)
