@@ -12,8 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PySide.QtCore import Qt, QTimer, QObject, QThread, Signal
-from PySide.QtGui import QKeySequence, QApplication
+from PyQt4.QtCore import Qt, QTimer, QObject, QThread, pyqtSignal
+from PyQt4.QtGui import QKeySequence, QApplication
 
 from Xlib.display import Display
 from Xlib import XK
@@ -24,7 +24,7 @@ from gui.hotkeys.global_hotkey_manager import GlobalHotkeyManagerBase
 
 
 class X11EventPoller(QObject):
-    keyPressed = Signal(object, object)
+    keyPressed = pyqtSignal(object, object)
 
     def __init__(self):
         QObject.__init__(self)

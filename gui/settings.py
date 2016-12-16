@@ -15,7 +15,7 @@
 import os
 import sys
 
-from PySide.QtGui import QDialog, QDialogButtonBox
+from PyQt4.QtGui import QDialog, QDialogButtonBox
 
 from libp2b import const
 from libp2b.settings import settings

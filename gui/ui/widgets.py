@@ -12,8 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PySide.QtCore import Qt
-from PySide.QtGui import QLineEdit, QKeySequence
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QLineEdit, QKeySequence
 
 
 class KeyShortcutEdit(QLineEdit):

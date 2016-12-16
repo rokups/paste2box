@@ -15,8 +15,8 @@
 import os
 from time import time
 
-from PySide.QtCore import Qt, QBuffer, QTimer
-from PySide.QtGui import QDialog, QMessageBox, QPixmap, QLabel, QImage, QWidget
+from PyQt4.QtCore import Qt, QBuffer, QTimer
+from PyQt4.QtGui import QDialog, QMessageBox, QPixmap, QLabel, QImage, QWidget
 
 from gui.login import LoginDialog
 from gui.result import ResultDialog

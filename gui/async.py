@@ -15,12 +15,12 @@
 import traceback
 
 import requests
-from PySide.QtCore import QObject, QRunnable, Signal
+from PyQt4.QtCore import QObject, QRunnable, pyqtSignal
 
 
 class AsyncUploaderSignals(QObject):
-    success = Signal(object)
-    error = Signal(str)
+    success = pyqtSignal(object)
+    error = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()

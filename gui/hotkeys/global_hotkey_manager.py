@@ -12,13 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PySide.QtGui import QKeySequence
-from PySide.QtCore import Qt, Signal
+from PyQt4.QtGui import QKeySequence
+from PyQt4.QtCore import Qt, pyqtSignal
 
 
 class GlobalHotkeyManagerBase(object):
-    keyPressed = Signal(int)
-    keyReleased = Signal(int)
+    keyPressed = pyqtSignal(int)
+    keyReleased = pyqtSignal(int)
 
     def __init__(self):
         self.shortcuts = {}

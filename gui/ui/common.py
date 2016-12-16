@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import urllib.parse
 
-from PySide.QtCore import Qt
-from PySide.QtGui import QLineEdit, QPlainTextEdit, QLabel, QCheckBox, QFontMetrics
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QLineEdit, QPlainTextEdit, QLabel, QCheckBox, QFontMetrics
 
 
 def get_control_by_type(param):

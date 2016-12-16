@@ -12,8 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PySide.QtCore import Qt, QEvent, QRect
-from PySide.QtGui import QApplication, QDialog, QPixmap, QRubberBand, QPushButton, QHBoxLayout, QWidget, QMessageBox,\
+from PyQt4.QtCore import Qt, QEvent, QRect
+from PyQt4.QtGui import QApplication, QDialog, QPixmap, QRubberBand, QPushButton, QHBoxLayout, QWidget, QMessageBox,\
     QFileDialog, QPainter, QColor
 
 

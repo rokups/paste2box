@@ -16,7 +16,7 @@ import ctypes
 from ctypes import POINTER
 from ctypes.wintypes import BOOL, MSG
 
-from PySide.QtCore import Qt, QTimer
+from PyQt4.QtCore import Qt, QTimer
 
 from gui.hotkeys.global_hotkey_manager import GlobalHotkeyManagerBase
 from gui.hotkeys.win32.hook import hotpatch, unhotpatch

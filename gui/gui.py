@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
-from PySide.QtCore import Qt, qDebug
-from PySide.QtGui import QApplication, QDialog, QMessageBox, QMainWindow, QSystemTrayIcon, QMenu, QIcon, QCursor,\
+from PyQt4.QtCore import Qt, qDebug
+from PyQt4.QtGui import QApplication, QDialog, QMessageBox, QMainWindow, QSystemTrayIcon, QMenu, QIcon, QCursor,\
     QKeySequence
 
 from gui.settings import SettingsDialog

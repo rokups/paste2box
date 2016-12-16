@@ -27,6 +27,6 @@ paste2box is the file sharing client whose purpose is to ease process of file sh
 ### Built with
 
 * Python 3.4+
-* PySide + Qt 4.8
+* PyQt4 + Qt 4.8
 
 ![Screenshot](https://raw.githubusercontent.com/rokups/paste2box/master/screenshot.png)
