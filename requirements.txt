@@ -1,6 +1,6 @@
 # PyQt4==4.11.4
-git+https://github.com/rokups/pyocclient.git
+pyocclient==0.3
 imgurpython==1.1.7
 google-api-python-client==1.5.0
-cx_Freeze==5.0.2
+cx_Freeze==5.0.1
 python3-xlib==0.15; sys_platform == 'linux'
