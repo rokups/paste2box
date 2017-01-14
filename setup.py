@@ -43,6 +43,7 @@ if sys.argv[1] == 'build':
 target_dir = os.path.join('build',
                           'exe.{sys.platform}-{sys.version_info.major}.{sys.version_info.minor}'.format(sys=sys))
 gui_executable = 'p2b-gui'
+cli_executable = 'p2b'
 certs = requests.certs.where()
 setup(name='p2b-gui',
       version='1.0',
@@ -59,7 +60,8 @@ setup(name='p2b-gui',
           },
       },
       executables=[
-          Executable(gui_executable, base=base)
+          Executable(gui_executable, base=base),
+          Executable(cli_executable)
       ],
       )
 print(os.path.join(target_dir, gui_executable + '.exe'))

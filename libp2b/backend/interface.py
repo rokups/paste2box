@@ -25,7 +25,6 @@ class BackendInterface(object):
     CanPostFile = 1 << 2
     CanAuthenticate = 1 << 3
     CanAnonymous = 1 << 4
-    CanMultiFile = 1 << 5
 
     Image = 1
     Text = 2

@@ -1,0 +1,174 @@
+#!/bin/env python3
+# paste2box - internet-enabled clipboard
+# Copyright (C) 2016  Rokas Kupstys
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import getpass
+import os
+import sys
+import argparse
+from contextlib import suppress
+
+from libp2b.backend import BackendInterface, all_backends
+from libp2b.utilities import get_image_type, read_text_from_file
+from libp2b.settings import settings
+
+
+def get_file_info(file_path):
+    if get_image_type(file_path):
+        return BackendInterface.CanPostImage, open(file_path, 'rb').read()
+
+    text = read_text_from_file(file_path)
+    if text:
+        return BackendInterface.CanPostText, text
+
+    return BackendInterface.CanPostFile, open(file_path, 'rb').read()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(help='Services', dest='service')
+
+    for name, backend in all_backends.items():
+        service_parser = subparsers.add_parser(backend.name)
+        service_parser.add_argument('--list-logins', action='store_true', help='List stored logins.')
+        service_parser.add_argument('--login', type=str, metavar='LOGIN', help='Login to the service or use login for '
+                                                                               'file upload.')
+        service_parser.add_argument('--logout', type=str, metavar='LOGIN', help='Remove stored login.')
+        service_parser.add_argument('--output-only', type=str, choices=list(map(str.lower, backend.result_fields.keys())),
+                                    required=False, default=None, help='Remove stored login.')
+
+        for title, options in backend.post_fields.items():
+            if isinstance(options, str):
+                options = (options,)
+            default = ''
+            required = 'optional' not in options
+            action = 'store_true' if options[0] == 'checkbox' else 'store'
+            # Will use actual file name if flag with overridden file name is not provided.
+            if title == 'Filename':
+                required = False
+            # Boolean arguments always result to False value and are optional.
+            if action == 'store_true':
+                default = False
+                required = False
+            option_name = '--' + title.lower().replace(' ', '-')
+            service_parser.add_argument(option_name, required=required, action=action, default=default,
+                                        help=title + ' (for file uploads)')
+
+        service_parser.add_argument('file_path', type=str, nargs='?', help='Path to file you want to share.')
+
+    args = parser.parse_args()
+    try:
+        service_class = all_backends[args.service]
+    except KeyError:
+        parser.print_help()
+        sys.exit(-1)
+
+    if args.file_path:
+        # Upload files
+        args.file_path = os.path.expanduser(args.file_path)
+        backend = service_class()
+        backend.login = args.login
+        required_capability, backend.content = get_file_info(args.file_path)
+        if not(backend.capabilities & required_capability):
+            print('Service "{backend.name}" does not support storing file "{args.file_path}".'.format(**locals()), file=sys.stderr)
+            sys.exit(-1)
+
+        if required_capability == BackendInterface.CanPostFile:
+            backend.share_type = BackendInterface.File
+        elif required_capability == BackendInterface.CanPostText:
+            backend.share_type = BackendInterface.Text
+        elif required_capability == BackendInterface.CanPostImage:
+            backend.share_type = BackendInterface.Image
+
+        parameters = {}
+        for title, options in backend.post_fields.items():
+            attribute_name = title.lower().replace(' ', '_')
+            parameters[title] = getattr(args, attribute_name)
+
+        with suppress(KeyError):
+            if not parameters['Filename']:
+                parameters['Filename'] = os.path.basename(args.file_path)
+
+        try:
+            result = backend.create(parameters)
+        except Exception as e:
+            print('Error: {e}'.format(**locals()), file=sys.stderr)
+            sys.exit(-1)
+        else:
+            for title, value in result.items():
+                if title.lower() == args.output_only:
+                    print(value)
+                    break
+            else:
+                max_title_len = max(*map(len, result.keys()))
+                for title, value in result.items():
+                    print('{title:{max_title_len}s}: {value}'.format(**locals()))
+            sys.exit(0)
+    elif args.list_logins:
+        try:
+            logins = settings[service_class.name]['login']
+        except (TypeError, KeyError):
+            print('Service "{}" has no saved logins.'.format(service_class.name), file=sys.stderr)
+            sys.exit(-1)
+        header = '--- {} logins ---'.format(args.service)
+        print(header)
+        for login_name in logins.keys():
+            print('* ' + login_name)
+        print('-' * len(header))
+        sys.exit(0)
+    elif args.login:
+        if service_class.name in settings and args.login in settings[service_class.name]['login']:
+            print('Login "{args.login}" already exists. Please remove it first using --logout {args.login}.'
+                  .format(**locals()), file=sys.stderr)
+            sys.exit(-1)
+
+        backend = service_class()
+        for k, v in backend.add_login_begin().items():
+            print('{k}: {v}'.format(**locals()))
+
+        parameters = {}
+        for field, options in backend.login_fields.items():
+            if 'label' in options:
+                # This data is displayed to user in previous step
+                continue
+            elif field in ('Title', 'Username', 'Login'):
+                parameters[field] = args.login
+            elif 'pwd' in options:
+                parameters[field] = getpass.getpass('Password:')
+            else:
+                parameters[field] = input('{field}: '.format(**locals()))
+
+        result = backend.add_login(parameters)
+        if result:
+            print('Logged in as "{result}"'.format(**locals()))
+            settings.save()
+            sys.exit(0)
+        else:
+            print('Login failed.', file=sys.stderr)
+            sys.exit(-1)
+    elif args.logout:
+        try:
+            del settings[service_class.name]['login'][args.logout]
+        except KeyError:
+            print('Login "{}" on service "{}" does not exist.'.format(service_class.name, args.logout), file=sys.stderr)
+            sys.exit(-1)
+        else:
+            settings.save()
+            sys.exit(0)
+
+    parser.print_help()
+    sys.exit(-1)
+
+if __name__ == '__main__':
+    sys.exit(main())

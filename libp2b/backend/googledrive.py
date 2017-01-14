@@ -40,7 +40,7 @@ class MemoryStorage(file.BaseStorage):
 
 
 class GoogleDriveBackend(Bi):
-    name = 'googledrive'
+    name = 'gdrive'
     capabilities = Bi.CanPostImage | Bi.CanPostText | Bi.CanPostFile | Bi.CanAuthenticate
     post_fields = OrderedDict((
         ('Filename', 'str'),
