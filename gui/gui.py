@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         self._menu = None
         self._action_screen = None
         self._action_clip = None
+        self._screenshot_wnd = None
         self.rebuild_menu()
 
         self._hotkey = hotkeys.initialize()
@@ -72,8 +73,12 @@ class MainWindow(QMainWindow):
         self._menu.popup(QCursor.pos())
 
     def capture_screen(self):
-        wnd = Screenshot()
+        if self._screenshot_wnd:
+            return
+
+        self._screenshot_wnd = wnd = Screenshot()
         result = wnd.exec()
+        self._screenshot_wnd = None
         if result == QDialog.Accepted:
             wnd = ShareDialog(self, image=wnd.selected_image)
             wnd.show()
