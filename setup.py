@@ -50,8 +50,6 @@ setup(name='p2b-gui',
       description='Internet clipboard',
       options={
           'build_exe': {
-              'icon': 'gui/ui/res/box.ico',
-              'compressed': True,
               'include_files': [
                   (certs, os.path.basename(certs)),
                   ('googledrive.json', 'googledrive.json')
@@ -60,15 +58,18 @@ setup(name='p2b-gui',
           },
       },
       executables=[
-          Executable(gui_executable, base=base),
-          Executable(cli_executable)
+          Executable(gui_executable, icon='gui/ui/res/box.ico', base=base),
+          Executable(cli_executable, icon='gui/ui/res/box.ico')
       ],
       )
-print(os.path.join(target_dir, gui_executable + '.exe'))
-subprocess.call([sys.executable, '-m', 'win32.lib.win32verstamp',
-                 '--version', const.APP_VERSION_STR + '.0',
-                 '--product', const.APP_NAME,
-                 '--copyright', 'Copyright © Rokas Kupstys'.format(const.APP_NAME),
-                 '--description', 'Internet-enabled clipboard client.',
-                 os.path.join(target_dir, gui_executable + '.exe')
-                 ])
+
+if sys.platform == 'win32':
+    for executable in gui_executable, cli_executable:
+        subprocess.call([
+            sys.executable, '-m', 'win32.lib.win32verstamp',
+            '--version', const.APP_VERSION_STR + '.0',
+            '--product', const.APP_NAME,
+            '--copyright', 'Copyright © Rokas Kupstys'.format(const.APP_NAME),
+            '--description', 'Internet-enabled clipboard client.',
+            os.path.join(target_dir, executable + '.exe')
+        ])
