@@ -106,15 +106,12 @@ class Screenshot(QDialog):
             self.tr('All Images (*.png *.jpg *.gif *.bmp)'): 'all'
         }
 
-        destination, file_format = QFileDialog.getSaveFileName(self, 'Save image', '', ';;'.join(formats.keys()))
+        destination = QFileDialog.getSaveFileName(self, 'Save image', '', ';;'.join(formats.keys()))
         if destination:
-            try:
-                file_format = formats[file_format]
-            except KeyError:
+            file_format = destination.rsplit('.', 1)[-1]
+            if file_format not in formats.values():
                 file_format = 'png'
-            if file_format == 'all':
-                file_format = 'png'
-            if not destination.lower().endswith('.' + file_format):
+            if not destination.endswith('.' + file_format):
                 destination += '.' + file_format
             img.save(destination, file_format, 0 if file_format == 'png' else 90)
         self.reject()
