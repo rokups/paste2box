@@ -195,7 +195,7 @@ class Screenshot(QDialog):
             if (wr.height() - br.bottom()) > self._buttons.height():        # if at bottom
                 y = br.bottom()
             else:
-                y = br.top() - self._buttons.height()
+                y = max(0, br.top() - self._buttons.height())
             self._buttons.move(x, y)
             self._buttons.show()
             self.repaint()
