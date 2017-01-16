@@ -12,11 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from AnyQt.QtCore import Qt, QEvent, QRect
-from AnyQt.QtGui import QPixmap, QPainter, QColor
+from AnyQt.QtCore import Qt, QEvent, QRect, QPoint
+from AnyQt.QtGui import QPixmap, QPainter, QColor, QScreen, QImage, QBrush
 from AnyQt.QtWidgets import QApplication, QDialog, QPushButton, QHBoxLayout, QWidget, QMessageBox, \
     QFileDialog, QRubberBand
 
+from gui.common import is_qt5
 
 RESIZE_TOP = 1
 RESIZE_RIGHT = 2
@@ -40,15 +41,26 @@ class Screenshot(QDialog):
         self._origin = None
         self.selected_image = None
 
-        desktop = QApplication.desktop()
-        self.setGeometry(desktop.geometry())
-
         # Window background
-        self._snapshot = QPixmap.grabWindow(desktop.winId(), 0, 0, desktop.width(), desktop.height())
+        desktop = QApplication.desktop()
+        if is_qt5():
+            g = desktop.geometry()
+            self._snapshot = QPixmap(g.width(), g.height())
+            painter = QPainter(self._snapshot)
+            for screen in QApplication.screens():
+                g = screen.geometry()
+                painter.drawPixmap(g, screen.grabWindow(0, g.x(), g.y(), g.width(), g.height()))
+            painter.end()
+        else:
+            self._snapshot = QPixmap.grabWindow(desktop.winId(), 0, 0, desktop.width(), desktop.height())
 
-        self._image = self._snapshot.toImage()
-        self._transparent = self._image.copy()
-        self.set_alpha(self._transparent, 100)
+        self.setGeometry(desktop.geometry())
+        self._darken = self._snapshot.copy()
+        painter = QPainter(self._darken)
+        brush = QBrush(QColor(0, 0, 0, 128))
+        painter.setBrush(brush)
+        painter.drawRect(self._darken.rect())
+        painter.end()
 
         # Buttons
         self._buttons = QWidget(self)
@@ -70,23 +82,13 @@ class Screenshot(QDialog):
         self._button_layout.addWidget(self.share)
         self._buttons.hide()
 
-    @staticmethod
-    def set_alpha(pixmap, val):
-        alpha = pixmap.copy()
-        painter = QPainter(alpha)
-        painter.fillRect(alpha.rect(), QColor(val, val, val))
-        painter.end()
-        pixmap.setAlphaChannel(alpha)
-        return pixmap
-
     def paintEvent(self, _):
         painter = QPainter(self)
-        painter.fillRect(self._transparent.rect(), Qt.black)
-        painter.drawImage(0, 0, self._transparent)
+        painter.drawPixmap(0, 0, self._darken)
         if self._band.isVisible():
             br = self._band.geometry()
             r = QRect(br.topLeft(), br.bottomRight())
-            painter.drawImage(r, self._image.copy(r))
+            painter.drawPixmap(r, self._snapshot.copy(r))
 
     def get_selection(self):
         return self._snapshot.copy(self._band.geometry())
