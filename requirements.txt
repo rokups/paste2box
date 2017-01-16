@@ -1,7 +1,8 @@
-# PyQt4==4.11.4
-pyocclient==0.3
-imgurpython==1.1.7
-google-api-python-client==1.5.0
-cx_Freeze==5.0.1
-python3-xlib==0.15; sys_platform == 'linux'
 AnyQt
+PyQt5                     <5.8
+cx_Freeze                 >5.0
+pyocclient               ==0.3
+imgurpython              ==1.1.7
+google-api-python-client ==1.5.0
+python3-xlib             ==0.15;  sys_platform == 'linux'
+pypiwin32                ==219;   sys_platform == 'win32'
