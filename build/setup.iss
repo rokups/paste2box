@@ -12,7 +12,7 @@
 ;
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#define ApplicationVersion GetFileVersion(".\exe.win32-3.4\p2b-gui.exe")
+#define ApplicationVersion GetFileVersion(".\exe.win32-3.5\p2b-gui.exe")
 #define ApplicationVersion Copy(ApplicationVersion, 0, Len(ApplicationVersion) - 2)
 
 #define MyAppName      "paste2box"
@@ -55,7 +55,7 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Name: "runonstartup"; Description: "Run on system start"; GroupDescription: "Startup:"; Flags: unchecked;
 
 [Files]
-Source: ".\exe.win32-3.4\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Excludes: "q*d4.dll"
+Source: ".\exe.win32-3.5\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Excludes: "q*d4.dll,Qt5Web*,Qt5Q*,qtwebengine*,qml"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
