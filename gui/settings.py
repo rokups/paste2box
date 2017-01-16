@@ -15,6 +15,8 @@
 import os
 import sys
 
+import AnyQt
+from AnyQt.QtCore import QT_VERSION_STR
 from AnyQt.QtWidgets import QDialog, QDialogButtonBox
 
 from libp2b import const
@@ -45,6 +47,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             self.clear_hotkey_screen.pressed.connect(lambda: self.printscreen.setChecked(False))
         else:
             self.printscreen.setVisible(False)
+        self.qt_version.setText('{} ({})'.format(QT_VERSION_STR, AnyQt.USED_API))
         self.resize(self.width(), 0)
 
     def _windows_print_screen(self, on):
