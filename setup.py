@@ -26,7 +26,34 @@ if sys.platform == 'win32':
 else:
     base = None
 
+
+qt_compilers = {
+    'PyQt5': [
+        lambda file_out, file_in: subprocess.call(['pyuic5', '--from-imports', '-o', file_out, file_in]),
+        lambda file_out, file_in: subprocess.call(['pyrcc5', '-o', file_out, file_in])
+    ],
+    'PyQt4': [
+        lambda file_out, file_in: subprocess.call(['pyuic4', '--from-imports', '-o', file_out, file_in]),
+        lambda file_out, file_in: subprocess.call(['pyrcc4', '-py3', '-o', file_out, file_in])
+    ],
+    'PySide': [
+        lambda file_out, file_in: subprocess.call(['pyside-uic', '--from-imports', '-o', file_out, file_in]),
+        lambda file_out, file_in: subprocess.call(['pyside-rcc', '-py3', '-o', file_out, file_in])
+    ]
+}
+
 if sys.argv[1] == 'build':
+    for module_name, compilers in qt_compilers.items():
+        try:
+            __import__(module_name)
+        except ImportError:
+            continue
+        if module_name in sys.modules:
+            qt_rcc, qt_uic = compilers
+            break
+    else:
+        raise RuntimeError('Qt is not available.')
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     ui_dir = os.path.join(current_dir, 'gui', 'ui')
     for file_name in os.listdir(ui_dir):
@@ -34,11 +61,12 @@ if sys.argv[1] == 'build':
         if file_name.endswith('.ui'):
             file_out = file_in[:-3] + '_ui.py'
             if not os.path.exists(file_out):
-                subprocess.call(['pyside-uic', '--from-imports', '-o', file_out, file_in])
+                qt_uic(file_out, file_in)
         elif file_name.endswith('.qrc'):
             file_out = file_in[:-4] + '_rc.py'
             if not os.path.exists(file_out):
-                subprocess.call(['pyside-rcc', '-py3', '-o', file_out, file_in])
+                qt_rcc(file_out, file_in)
+
 
 target_dir = os.path.join('build',
                           'exe.{sys.platform}-{sys.version_info.major}.{sys.version_info.minor}'.format(sys=sys))
@@ -55,13 +83,15 @@ setup(name='p2b-gui',
                   ('googledrive.json', 'googledrive.json')
               ],
               'include_msvcr': True,
+              'includes': [
+                  'requests.packages.idna.idnadata',    # To make Linux builds happy
+              ]
           },
       },
       executables=[
           Executable(gui_executable, icon='gui/ui/res/box.ico', base=base),
           Executable(cli_executable, icon='gui/ui/res/box.ico')
-      ],
-      )
+      ])
 
 if sys.platform == 'win32':
     for executable in gui_executable, cli_executable:
