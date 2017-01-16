@@ -15,7 +15,7 @@
 import traceback
 
 import requests
-from PyQt4.QtCore import QObject, QRunnable, pyqtSignal
+from AnyQt.QtCore import QObject, QRunnable, pyqtSignal
 
 
 class AsyncUploaderSignals(QObject):

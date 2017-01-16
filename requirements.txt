@@ -4,3 +4,4 @@ imgurpython==1.1.7
 google-api-python-client==1.5.0
 cx_Freeze==5.0.1
 python3-xlib==0.15; sys_platform == 'linux'
+AnyQt

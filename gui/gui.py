@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
-from PyQt4.QtCore import Qt, qDebug
-from PyQt4.QtGui import QApplication, QDialog, QMessageBox, QMainWindow, QSystemTrayIcon, QMenu, QIcon, QCursor,\
-    QKeySequence
+from AnyQt.QtCore import Qt, qDebug
+from AnyQt.QtGui import QIcon, QCursor, QKeySequence
+from AnyQt.QtWidgets import QApplication, QDialog, QMessageBox, QMainWindow, QSystemTrayIcon, QMenu
 
 from gui.settings import SettingsDialog
 from libp2b.settings import settings
@@ -67,7 +67,8 @@ class MainWindow(QMainWindow):
         self._tray.setContextMenu(self._menu)
 
     def __del__(self):
-        self._hotkey.destroy()
+        if self._hotkey:
+            self._hotkey.destroy()
 
     def show_tray_menu(self):
         self._menu.popup(QCursor.pos())

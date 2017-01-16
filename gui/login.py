@@ -12,8 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PyQt4.QtCore import QThreadPool, Qt
-from PyQt4.QtGui import QDialog, QMessageBox, QLabel
+from AnyQt.QtCore import QThreadPool, Qt
+from AnyQt.QtWidgets import QDialog, QMessageBox, QLabel
 
 from gui.ui.common import get_control_by_type, get_widget_value, set_widget_value
 from .async import AsyncUploader

@@ -12,8 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PyQt4.QtCore import Qt, QTimer, QObject, QThread, pyqtSignal
-from PyQt4.QtGui import QKeySequence, QApplication
+from AnyQt.QtCore import Qt, QTimer, QObject, QThread, pyqtSignal
+from AnyQt.QtGui import QKeySequence
+from AnyQt.QtWidgets import QApplication
 
 from Xlib.display import Display
 from Xlib import XK

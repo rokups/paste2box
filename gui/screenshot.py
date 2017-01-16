@@ -12,9 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from PyQt4.QtCore import Qt, QEvent, QRect
-from PyQt4.QtGui import QApplication, QDialog, QPixmap, QRubberBand, QPushButton, QHBoxLayout, QWidget, QMessageBox,\
-    QFileDialog, QPainter, QColor
+from AnyQt.QtCore import Qt, QEvent, QRect
+from AnyQt.QtGui import QPixmap, QPainter, QColor
+from AnyQt.QtWidgets import QApplication, QDialog, QPushButton, QHBoxLayout, QWidget, QMessageBox, \
+    QFileDialog, QRubberBand
 
 
 RESIZE_TOP = 1
@@ -100,15 +101,24 @@ class Screenshot(QDialog):
 
         formats = {
             self.tr('Portable Network Graphics (*.png)'): 'png',
-            self.tr('Joint Photographic Experts Group (*.jpg)'): 'jpg',
+            self.tr('Joint Photographic Experts Group (*.jpg *.jpeg)'): 'jpg',
             self.tr('Graphics Interchange Format (*.gif)'): 'gif',
             self.tr('Bitmap (*.bmp)'): 'bmp',
             self.tr('All Images (*.png *.jpg *.gif *.bmp)'): 'all'
         }
 
+        file_format = None
         destination = QFileDialog.getSaveFileName(self, 'Save image', '', ';;'.join(formats.keys()))
-        if destination:
+        if isinstance(destination, tuple):
+            destination, file_format = destination
+            file_format = formats[file_format]
+            if file_format == 'all':
+                file_format = None
+
+        if not file_format:
             file_format = destination.rsplit('.', 1)[-1]
+
+        if destination:
             if file_format not in formats.values():
                 file_format = 'png'
             if not destination.endswith('.' + file_format):
