@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
-from AnyQt.QtCore import Qt, qDebug
+from AnyQt.QtCore import Qt, qDebug, QTimer
 from AnyQt.QtGui import QIcon, QCursor, QKeySequence
 from AnyQt.QtWidgets import QApplication, QDialog, QMessageBox, QMainWindow, QSystemTrayIcon, QMenu
 
@@ -51,7 +51,6 @@ class MainWindow(QMainWindow):
             settings.save()
 
         self.register_hotkeys()
-        self.load_settings()
 
     def rebuild_menu(self):
         # Terrible way to clear hotkey shortcuts set to actions because Qt can not do that.
@@ -78,12 +77,12 @@ class MainWindow(QMainWindow):
             return
 
         self._screenshot_wnd = wnd = Screenshot()
-        result = wnd.exec()
+        result = wnd.exec_()
         self._screenshot_wnd = None
         if result == QDialog.Accepted:
             wnd = ShareDialog(self, image=wnd.selected_image)
             wnd.show()
-            wnd.exec()
+            wnd.exec_()
 
     def share_clipboard(self):
         mime = QApplication.clipboard().mimeData()
@@ -94,13 +93,10 @@ class MainWindow(QMainWindow):
             return
         else:
             wnd.show()
-            wnd.exec()
-
-    def load_settings(self):
-        pass
+            wnd.exec_()
 
     def register_hotkeys(self):
-        if self._hotkey:
+        if self._hotkey is not None:
             self.rebuild_menu()
             self._hotkey.unregister(winid=self.winId())
             hotkey_bindings = {
@@ -123,9 +119,9 @@ class MainWindow(QMainWindow):
         self._hotkey.unregister(winid=self.winId())
         dlg = SettingsDialog(self)
         dlg.show()
-        if dlg.exec_() == QDialog.Accepted:
-            self.load_settings()
-        self.register_hotkeys()
+        dlg.exec_()
+        # WORKAROUND: On windows calling register_hotkeys() directly often results in a crash.
+        QTimer.singleShot(10, self.register_hotkeys)
 
 
 def main():
