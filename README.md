@@ -29,7 +29,7 @@ paste2box is the file sharing client whose purpose is to ease process of file sh
 ### Built with
 
 * Python 3.5+
-* PyQt4 + Qt 4.8
+* PyQt4 | PyQt5 | PySide
 
 ### Command line client examples
 
