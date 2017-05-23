@@ -45,8 +45,13 @@ def main():
         service_parser.add_argument('--login', type=str, metavar='LOGIN', help='Login to the service or use login for '
                                                                                'file upload.')
         service_parser.add_argument('--logout', type=str, metavar='LOGIN', help='Remove stored login.')
-        service_parser.add_argument('--output-only', type=str, choices=list(map(str.lower, backend.result_fields.keys())),
-                                    required=False, default=None, help='Remove stored login.')
+        if len(backend.result_fields) > 1:
+            service_parser.add_argument('--output-only', type=str,
+                                        choices=list(map(str.lower, backend.result_fields.keys())),
+                                        required=False, default=None, help='Output raw result value of single field.')
+        else:
+            service_parser.add_argument('--output-only', action='store_true', default=False,
+                                        help='Output raw result value.')
 
         for title, options in backend.post_fields.items():
             if isinstance(options, str):
@@ -106,12 +111,15 @@ def main():
             print('Error: {e}'.format(**locals()), file=sys.stderr)
             sys.exit(-1)
         else:
-            for title, value in result.items():
-                if title.lower() == args.output_only:
-                    print(value)
-                    break
+            if args.output_only:
+                if isinstance(args.output_only, bool):
+                    print(list(result.values())[0])
+                else:
+                    for title, value in result.items():
+                        if title.lower() == args.output_only:
+                            print(value)
             else:
-                max_title_len = max(*map(len, result.keys()))
+                max_title_len = max(map(len, result.keys()))
                 for title, value in result.items():
                     print('{title:{max_title_len}s}: {value}'.format(**locals()))
             sys.exit(0)
