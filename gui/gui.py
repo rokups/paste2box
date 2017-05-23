@@ -66,8 +66,9 @@ class MainWindow(QMainWindow):
         self._tray.setContextMenu(self._menu)
 
     def __del__(self):
-        if self._hotkey:
-            self._hotkey.destroy()
+        hotkey = getattr(self, '_hotkey', None)
+        if hotkey:
+            hotkey.destroy()
 
     def show_tray_menu(self):
         self._menu.popup(QCursor.pos())
