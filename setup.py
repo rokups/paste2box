@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # coding=utf-8
 # paste2box - internet-enabled clipboard
 # Copyright (C) 2016  Rokas Kupstys
@@ -49,7 +50,8 @@ if sys.argv[1] == 'build':
         except ImportError:
             continue
         if module_name in sys.modules:
-            qt_rcc, qt_uic = compilers
+            print('Using', module_name)
+            qt_uic, qt_rcc = compilers
             break
     else:
         raise RuntimeError('Qt is not available.')
