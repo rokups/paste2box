@@ -1,8 +1,8 @@
 AnyQt
-PyQt5                     <5.8
+PyQt5                     >5.0
 cx_Freeze                 >5.0
-pyocclient               ==0.3
+pyocclient               ==0.4
 imgurpython              ==1.1.7
 google-api-python-client ==1.5.0
 python3-xlib             ==0.15;  sys_platform == 'linux'
-pypiwin32                ==219;   sys_platform == 'win32'
+pypiwin32                ==220;   sys_platform == 'win32'
