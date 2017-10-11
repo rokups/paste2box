@@ -71,7 +71,7 @@ class ImgurBackend(Bi):
             'description': parameters['Description']
         }, self.login is None)
 
-        ro_url = 'https' + image['link'][4:image['link'].rindex('.')]
+        ro_url = image['link'][:image['link'].rindex('.')]
         rw_url = 'https://imgur.com/delete/' + image['deletehash']
 
         if self.progress_callback:
