@@ -94,13 +94,18 @@ class GoogleDriveBackend(Bi):
                 raise RuntimeError()
 
             media_body = MediaIoBaseUpload(fd, mimetype=mime)
-            body = {
+            metadata = service.files().create(body={
                 'name': parameters['Title'] or parameters['Filename'],
                 'originalFilename': parameters['Filename'],
                 'description': parameters['Description'],
                 'mimeType': mime,
-            }
-            metadata = service.files().create(body=body, media_body=media_body).execute()
+            }, media_body=media_body).execute()
+
+            service.permissions().create(fileId=metadata['id'], body={
+                'value': 'default',
+                'type': 'anyone',
+                'role': 'reader'
+            }).execute()
 
         except Exception:
             if self.progress_callback:
