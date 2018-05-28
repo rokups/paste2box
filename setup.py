@@ -75,9 +75,10 @@ target_dir = os.path.join('build',
 gui_executable = 'p2b-gui'
 cli_executable = 'p2b'
 certs = requests.certs.where()
-setup(name='p2b-gui',
-      version='1.0',
+setup(name='paste2box',
+      version=const.APP_VERSION_STR,
       description='Internet clipboard',
+      author='Rokas Kupstys',
       options={
           'build_exe': {
               'include_files': [
@@ -93,6 +94,10 @@ setup(name='p2b-gui',
       executables=[
           Executable(gui_executable, icon='gui/ui/res/box.ico', base=base),
           Executable(cli_executable, icon='gui/ui/res/box.ico')
+      ],
+      classifiers=[
+          'License :: OSI Approved :: MIT License',
+          'Programming Language :: Python :: 3',
       ])
 
 if sys.platform == 'win32':
