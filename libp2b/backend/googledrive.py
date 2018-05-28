@@ -12,8 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import sys
+
 import json
 import httplib2
+import os
 from io import BytesIO
 from collections import OrderedDict
 from googleapiclient import discovery
@@ -115,8 +118,18 @@ class GoogleDriveBackend(Bi):
                 fd.close()
 
     def add_login_begin(self):
-        flow = self._flow = client.flow_from_clientsecrets('googledrive.json',
-                                                           'https://www.googleapis.com/auth/drive.file')
+        gdrive = 'googledrive.json'
+        if not getattr(sys, 'frozen', False):
+            parent_dir = os.path.realpath(__file__)
+            while True:
+                assert len(parent_dir) > (3 if os.name == 'nt' else 1)
+                gdrive = os.path.join(parent_dir, 'googledrive.json')
+                if os.path.isfile(gdrive):
+                    break
+                else:
+                    parent_dir = os.path.dirname(parent_dir)
+
+        flow = self._flow = client.flow_from_clientsecrets(gdrive, 'https://www.googleapis.com/auth/drive.file')
         flow.user_agent = const.APP_USERAGENT
         flow.redirect_uri = client.OOB_CALLBACK_URN
         authorize_url = flow.step1_get_authorize_url()
