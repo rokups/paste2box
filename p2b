@@ -83,7 +83,7 @@ def main():
         # Upload files
         args.file_path = os.path.expanduser(args.file_path)
         backend = service_class()
-        backend.login = args.login
+        backend.login = args.login or settings[service_class.name]['last_login']
         required_capability, backend.content = get_file_info(args.file_path)
         if not(backend.capabilities & required_capability):
             print('Service "{backend.name}" does not support storing file "{args.file_path}".'.format(**locals()), file=sys.stderr)
@@ -122,7 +122,10 @@ def main():
                 max_title_len = max(map(len, result.keys()))
                 for title, value in result.items():
                     print('{title:{max_title_len}s}: {value}'.format(**locals()))
-            sys.exit(0)
+
+            settings[service_class.name]['last_login'] = backend.login
+            settings.save()
+        sys.exit(0)
     elif args.list_logins:
         try:
             logins = settings[service_class.name]['login']
@@ -132,7 +135,7 @@ def main():
         header = '--- {} logins ---'.format(args.service)
         print(header)
         for login_name in logins.keys():
-            print('* ' + login_name)
+            print(('* ' if settings[service_class.name]['last_login'] == login_name else '  ') + login_name)
         print('-' * len(header))
         sys.exit(0)
     elif args.login:
