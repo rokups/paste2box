@@ -33,11 +33,14 @@ class SettingsManager(object):
             raise NotImplementedError('Platform "{}" is not supported!'.format(sys.platform))
         self._settings_file = os.path.join(self.config_dir, 'p2b.json')
         try:
-            with open(self._settings_file) as fp:
-                self._settings = json.loads(fp.read())
+            self.reload()
         except (ValueError, FileNotFoundError):
             self._settings = copy.deepcopy(self._defaults)
         self._auto_save = 0
+
+    def reload(self):
+        with open(self._settings_file) as fp:
+            self._settings = json.loads(fp.read())
 
     @staticmethod
     def register_defaults(backends):
@@ -52,6 +55,7 @@ class SettingsManager(object):
             return False
 
     def __getitem__(self, item):
+        self.reload()
         parts = item.split('/')
         s = self._settings
         d = self._defaults
